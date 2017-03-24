@@ -1,18 +1,34 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region Using Statments
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Primitives;
-
+#endregion
 namespace Assignment4
+
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game
     {
+        #region Fields
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Effect skyBoxEffect;
+        TextureCube skyboxTexture;
 
+        Cube skybox;
+        Matrix world;
+        Matrix view;
+        Matrix projection;
+        Vector3 cameraPosition = new Vector3(0, 0, 20);
+        Vector3 cameraTarget = new Vector3(0, 0, 0);
+        float temp = 0f;
+
+        #endregion
+
+        #region Initialize
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -28,6 +44,11 @@ namespace Assignment4
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            Matrix world = Matrix.Identity;
+            Matrix view = Matrix.CreateLookAt(cameraPosition, new Vector3(0, 0, 0), Vector3.Up);
+            Matrix projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(45), GraphicsDevice.DisplayMode.AspectRatio, 0.1f, 200f);
+            skybox = new Cube();
+            skybox.Scale = 100;
 
             base.Initialize();
         }
@@ -41,8 +62,12 @@ namespace Assignment4
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            skyboxTexture = Content.Load<TextureCube>("Skyboxes/SkyBoxTexture");
+            skyBoxEffect = Content.Load<Effect>("Skyboxes/skybox");
+            
             // TODO: use this.Content to load your game content here
         }
+        #endregion
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
@@ -77,6 +102,29 @@ namespace Assignment4
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            RasterizerState originalRasterizerState = graphics.GraphicsDevice.RasterizerState;
+            RasterizerState rasterizerState = new RasterizerState();
+            rasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
+            graphics.GraphicsDevice.RasterizerState = rasterizerState;
+
+
+            foreach (EffectTechnique technique in skyBoxEffect.Techniques)
+            {
+                foreach (EffectPass pass in technique.Passes)
+                {
+                    pass.Apply();
+
+                    skyBoxEffect.Parameters["World"].SetValue(world);
+                    skyBoxEffect.Parameters["View"].SetValue(view);
+                    skyBoxEffect.Parameters["Projection"].SetValue(projection);
+                    skyBoxEffect.Parameters["SkyBoxTexture"].SetValue(skyboxTexture);
+                    skyBoxEffect.Parameters["CameraPosition"].SetValue(cameraPosition);
+
+                    skybox.Render(GraphicsDevice);
+                }
+            }
+
+            GraphicsDevice.RasterizerState = originalRasterizerState;
 
             base.Draw(gameTime);
         }

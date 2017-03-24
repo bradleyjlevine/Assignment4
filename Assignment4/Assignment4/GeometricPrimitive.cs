@@ -33,15 +33,15 @@ namespace Primitives
         // During the process of constructing a primitive model, vertex
         // and index data is stored on the CPU in these managed lists.
         List<VertexPositionNormal> vertices = new List<VertexPositionNormal>();
-        List<ushort> indices = new List<ushort>();
+        public List<ushort> indices = new List<ushort>();
 
 
         // Once all the geometry has been specified, the InitializePrimitive
         // method copies the vertex and index data into these buffers, which
         // store it on the GPU ready for efficient rendering.
-        VertexBuffer vertexBuffer;
-        IndexBuffer indexBuffer;
-        BasicEffect basicEffect;
+        public VertexBuffer vertexBuffer;
+        public IndexBuffer indexBuffer;
+        public BasicEffect basicEffect;
 
 
         #endregion
@@ -53,7 +53,7 @@ namespace Primitives
         /// Adds a new vertex to the primitive model. This should only be called
         /// during the initialization process, before InitializePrimitive.
         /// </summary>
-        protected void AddVertex(Vector3 position, Vector3 normal)
+        public void AddVertex(Vector3 position, Vector3 normal)
         {
             vertices.Add(new VertexPositionNormal(position, normal));
         }
@@ -63,7 +63,7 @@ namespace Primitives
         /// Adds a new index to the primitive model. This should only be called
         /// during the initialization process, before InitializePrimitive.
         /// </summary>
-        protected void AddIndex(int index)
+        public void AddIndex(int index)
         {
             if (index > ushort.MaxValue)
                 throw new ArgumentOutOfRangeException("index");
@@ -76,7 +76,7 @@ namespace Primitives
         /// Queries the index of the current vertex. This starts at
         /// zero, and increments every time AddVertex is called.
         /// </summary>
-        protected int CurrentVertex
+        public int CurrentVertex
         {
             get { return vertices.Count; }
         }
@@ -86,7 +86,7 @@ namespace Primitives
         /// Once all the geometry has been specified by calling AddVertex and AddIndex,
         /// this method copies the vertex and index data into GPU format buffers, ready
         /// for efficient rendering.
-        protected void InitializePrimitive(GraphicsDevice graphicsDevice)
+        public void InitializePrimitive(GraphicsDevice graphicsDevice)
         {
             // Create a vertex declaration, describing the format of our vertex data.
 
@@ -133,7 +133,7 @@ namespace Primitives
         /// <summary>
         /// Frees resources used by this object.
         /// </summary>
-        protected virtual void Dispose(bool disposing)
+        public virtual void Dispose(bool disposing)
         {
             if (disposing)
             {

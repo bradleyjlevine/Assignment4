@@ -29,6 +29,8 @@ namespace Primitives
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name = "position">the position of the vertex</param>
+        /// <param name = "normal">the normal of the vertex</param>>
         public VertexPositionNormal(Vector3 position, Vector3 normal)
         {
             Position = position;
