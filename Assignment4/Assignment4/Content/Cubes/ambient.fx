@@ -11,16 +11,8 @@ float4x4 World;
 float4x4 View;
 float4x4 Projection;
 
-float3 CameraPosition;
-
-TextureCube SkyBoxTexture;
-SamplerState SkyBoxSampler
-{
-	texture = <SkyBoxTexture>;
-	filter = LINEAR;
-	AddressU = Mirror;
-	AddressV = Mirror;
-};
+float4 AmbientColor;
+float AmbientIntensity;
 
 struct VertexShaderInput
 {
@@ -30,7 +22,6 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
 	float4 Position : POSITION0;
-	float3 TextureCoordinate : TEXCOORD0;
 };
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
@@ -41,24 +32,19 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
 
-	float4 VertexPosition = mul(input.Position, World);
-	output.TextureCoordinate = (float3) VertexPosition - CameraPosition;
-
 	return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-	float4 color = SkyBoxTexture.Sample(SkyBoxSampler, normalize(input.TextureCoordinate));
-	color.a = 1;
-	return color;
+	return saturate(AmbientColor * AmbientIntensity);
 }
 
-technique Skybox
+technique Ambient
 {
-	pass P0
+	pass Pass1
 	{
 		VertexShader = compile VS_SHADERMODEL VertexShaderFunction();
 		PixelShader = compile PS_SHADERMODEL PixelShaderFunction();
 	}
-};
+}

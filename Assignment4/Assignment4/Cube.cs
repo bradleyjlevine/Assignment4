@@ -12,7 +12,6 @@ namespace Assignment4
     class Cube
     {
         #region Fields
-        bool isConstructed = false;
         static VertexPositionNormalTexture[] vertices;
 
         //Calculate the position of the vertices on the top face
@@ -44,93 +43,13 @@ namespace Assignment4
         const ushort NUM_VERTICES = 36;
         #endregion
 
-        #region Cube Info Properties
-        public Vector3 Position { get; set; }
-        public float Scale { get; set; }
-        public Color Colour { get; set; }
-        public Vector3 Velocity { get; set; }
-        #endregion
-
         #region Initialize 
         /// <summary>
         /// Constructor for sky cube
         /// </summary>
         public Cube()
         {
-            Position = Vector3.Zero;
-            Scale = 1f;
-            Colour = Color.White;
-            Velocity = Vector3.Zero;
-        }
-
-        /// <summary>
-        /// Constructor for basic cube
-        /// </summary>
-        /// <param name="position">cube's position in x, y, z</param>
-        /// <param name="scale">what to scale the image by</param>
-        /// <param name="colour">what is the color of the cube in RGB</param>
-        /// <param name="velocity">what is the velocity of the cube in x, y, z</param>
-        public Cube(Vector3 position, float scale, Color colour, Vector3 velocity)
-        {
-            Position = position;
-            Scale = scale;
-            Colour = colour;
-            Velocity = velocity;
-        }
-        #endregion
-
-        /// <summary>
-        /// Sets up the vertex buffer with the needed information and creates the cube
-        /// </summary>
-        /// <param name="device"> this is the graphics device</param>
-        public void Render(GraphicsDevice device)
-        {
-            if (isConstructed == false)
-                 Construct();
-
-            Console.WriteLine(ToString());
-
-            VertexBuffer buffer = new VertexBuffer(device, typeof(VertexPositionNormalTexture), NUM_VERTICES, BufferUsage.WriteOnly);
-
-            buffer.SetData<VertexPositionNormalTexture>(vertices);
-
-            device.SetVertexBuffer(buffer);
-
-            device.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
-        }
-
-        /// <summary>
-        /// this creats the cube
-        /// </summary>
-        public void Construct()
-        {
             vertices = new VertexPositionNormalTexture[NUM_VERTICES];
-
-            //Calculate the position of the vertices on the top face
-            topLeftFront = Position + topLeftFront * Scale;
-            topLeftBack = Position + topLeftBack * Scale;
-            topRightFront = Position + topRightFront * Scale;
-            topRightBack = Position + topRightBack * Scale;
-
-            //Calculate the postion of the vertices on the bottom face
-            btmLeftFront = Position +btmLeftFront * Scale;
-            btmLeftBack = Position + btmLeftBack * Scale;
-            btmRightFront = Position + btmRightFront * Scale;
-            btmRightBack = Position + btmRightBack * Scale;
-
-            //Normal vector for each face
-            normalFront *= Scale;
-            normalBack *= Scale;
-            normalTop *= Scale;
-            normalBottom *= Scale;
-            normalLeft *= Scale;
-            normalRight *= Scale;
-
-            //UV texture coordinates
-            textureTopLeft *= Scale;
-            textureTopRight *= Scale;
-            textureBottomLeft *= Scale;
-            textureBottomRight *= Scale;
 
             //Add the vertices for the front face
             vertices[0] = new VertexPositionNormalTexture(topLeftFront, normalFront, textureTopLeft);
@@ -179,10 +98,30 @@ namespace Assignment4
             vertices[33] = new VertexPositionNormalTexture(topRightBack, normalRight, textureTopRight);
             vertices[34] = new VertexPositionNormalTexture(topRightFront, normalRight, textureTopLeft);
             vertices[35] = new VertexPositionNormalTexture(btmRightBack, normalRight, textureBottomRight);
-
-            isConstructed = true;
         }
 
+        #endregion
+
+        /// <summary>
+        /// Sets up the vertex buffer with the needed information and creates the cube
+        /// </summary>
+        /// <param name="device"> this is the graphics device</param>
+        public void Render(GraphicsDevice device)
+        {
+
+            VertexBuffer buffer = new VertexBuffer(device, typeof(VertexPositionNormalTexture), NUM_VERTICES, BufferUsage.WriteOnly);
+
+            buffer.SetData<VertexPositionNormalTexture>(vertices);
+
+            device.SetVertexBuffer(buffer);
+
+            device.DrawPrimitives(PrimitiveType.TriangleList, 0, 12);
+        }
+
+        /// <summary>
+        /// creates string for cube object
+        /// </summary>
+        /// <returns>the string representation of the cube object</returns>
         public override string ToString()
         {
             string message = "Vertices: \n\n";
