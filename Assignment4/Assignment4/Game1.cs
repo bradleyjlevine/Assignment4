@@ -28,6 +28,7 @@ namespace Assignment4
     /// </summary>
     public class Game1 : Game
     {
+        //fields for the game; effects, shapes, and matrices
         #region Fields
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -49,6 +50,7 @@ namespace Assignment4
 
         #endregion
 
+        //this initalizes the game
         #region Initialize
         public Game1()
         {
@@ -82,6 +84,10 @@ namespace Assignment4
             base.Initialize();
         }
 
+        #region Create Cubes and Spheres
+        /// <summary>
+        /// This creates the other 80 cubes; position, scale, color, and velocity.  The random object is seeded with the current time.
+        /// </summary>
         public void CreateCubes()
         {
             Random random = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
@@ -96,6 +102,9 @@ namespace Assignment4
             }
         }
 
+        /// <summary>
+        /// This creates 3 spheres; position, radius is 10 (scale) and tesselation is 10, color, and velocity.  The random object is seeded with the current time.
+        /// </summary>
         public void CreateSpheres()
         {
             Random random = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
@@ -109,7 +118,7 @@ namespace Assignment4
             }
         }
 
-        
+        #endregion
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
@@ -120,12 +129,11 @@ namespace Assignment4
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            //loads the shader code and texturecube for the skybox
             skyboxTexture = Content.Load<TextureCube>("Skyboxes/SkyBoxTexture");
             skyBoxEffect = Content.Load<Effect>("Skyboxes/skybox");
 
             cubeEffect = Content.Load<Effect>("Cubes/pointlight");
-            
-            // TODO: use this.Content to load your game content here
         }
         #endregion
 
@@ -136,6 +144,9 @@ namespace Assignment4
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            skyBoxEffect.Dispose();
+            skyboxTexture.Dispose();
+            lightEffect.Dispose();
             Content.Unload();
         }
 
@@ -149,6 +160,7 @@ namespace Assignment4
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            //gets the state of the keyboards
             KeyboardState state = Keyboard.GetState();
 
             #region Rotation and Translations of View
@@ -201,7 +213,7 @@ namespace Assignment4
             // TODO: Add your drawing code here
             RasterizerState originalRasterizerState = graphics.GraphicsDevice.RasterizerState;
             RasterizerState rasterizerState = new RasterizerState();
-            rasterizerState.CullMode = CullMode.CullClockwiseFace;
+            rasterizerState.CullMode = CullMode.None;
             graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
             BlendState orginalBlendState = graphics.GraphicsDevice.BlendState;
@@ -216,7 +228,7 @@ namespace Assignment4
 
             Vector4 color;
 
-            //creates skycube
+            //renders skycube
             foreach (EffectTechnique technique in skyBoxEffect.Techniques)
             {
                 foreach (EffectPass pass in technique.Passes)
@@ -235,8 +247,10 @@ namespace Assignment4
 
             Vector3 pos, v;
 
+            //generates the spheres to represent the point lights
             for(int i = 0; i < lightData.Length; i++)
             {
+                //updates the position based on the velocity multiplied by the seconds passed
                 lightData[i].position += lightData[i].velocity * gameTime.ElapsedGameTime.Milliseconds / 1000f;
 
                 Bounce(lightData[i].position, 10f, out v, out pos);
@@ -266,9 +280,10 @@ namespace Assignment4
 
             }
 
+            //renders the other 80 cubes
             for(int i = 1; i < cubeData.Length; i++)
             {
-                
+                //updates the position of the cube based on the velocity multiplied by the number of seconds that passed
                 cubeData[i].position += cubeData[i].velocity * gameTime.ElapsedGameTime.Milliseconds / 1000f;
 
                 Bounce(cubeData[i].position, cubeData[i].scale, out v, out pos);
@@ -276,6 +291,7 @@ namespace Assignment4
                 cubeData[i].position += pos;
                 cubeData[i].velocity *= v;
 
+                //shades each cube for the three point lights
                 for (int j = 0; j < lightData.Length; j++)
                 {
                     foreach (EffectTechnique technique in cubeEffect.Techniques)
@@ -313,14 +329,12 @@ namespace Assignment4
         }
 
         /// <summary>
-        /// Checks if a object has bounced out of the skycube
+        /// This checks if the postion is out of the skybox and inverts the velocity and moves the the position back by 1.
         /// </summary>
-        /// <param name="position"> current position of object</param>
-        /// <param name="scale">the scale of the current object</param>
-        /// <param name="x">is set to -1 if the velocity in x needs to be inverted. Set to 1 by default</param>
-        /// <param name="y">is set to -1 if the velocity in y needs to be inverted. Set to 1 by default</param>
-        /// <param name="z">is set to -1 if the velocity in z needs to be inverted. Set to 1 by default</param>
-        /// <param name = "position">updated position</param>
+        /// <param name="position">position of the object</param>
+        /// <param name="scale">if you scaled the object</param>
+        /// <param name="v">multiply this to your volicty vector to update it</param>
+        /// <param name="pos">add this to your position vector to update it</param>
         void Bounce(Vector3 position, float scale,  out Vector3 v, out Vector3 pos)
         {
             pos = Vector3.Zero;

@@ -20,10 +20,10 @@ static const float PI = 3.14159265f;
 
 float4 AmbientColor;
 float AmbientIntensity;
-float4 DiffuseColor;
+float4 DiffuseColor = float4(1, 1, 1, 1);
 float DiffuseIntensity = 0.7;
 float Shininess = 10;
-float4 SpecularColor;
+float4 SpecularColor = float4 (1, 1, 1, 1);
 float SpecularIntensity = 0.5;
 
 struct VertexShaderInput
