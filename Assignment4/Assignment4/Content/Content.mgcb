@@ -37,3 +37,9 @@
 /processorParam:DebugMode=Auto
 /build:Cubes/ambient.fx
 
+#begin Cubes/pointlight.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Cubes/pointlight.fx
+

@@ -42,7 +42,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 technique Ambient
 {
-	pass Pass1
+	pass P0
 	{
 		VertexShader = compile VS_SHADERMODEL VertexShaderFunction();
 		PixelShader = compile PS_SHADERMODEL PixelShaderFunction();

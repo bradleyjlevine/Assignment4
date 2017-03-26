@@ -123,7 +123,7 @@ namespace Assignment4
             skyboxTexture = Content.Load<TextureCube>("Skyboxes/SkyBoxTexture");
             skyBoxEffect = Content.Load<Effect>("Skyboxes/skybox");
 
-            cubeEffect = Content.Load<Effect>("Cubes/ambient");
+            cubeEffect = Content.Load<Effect>("Cubes/pointlight");
             
             // TODO: use this.Content to load your game content here
         }
@@ -276,21 +276,31 @@ namespace Assignment4
                 cubeData[i].position += pos;
                 cubeData[i].velocity *= v;
 
-                foreach(EffectTechnique technique in cubeEffect.Techniques)
+                for (int j = 0; j < lightData.Length; j++)
                 {
-                    foreach(EffectPass pass in technique.Passes)
+                    foreach (EffectTechnique technique in cubeEffect.Techniques)
                     {
-                        pass.Apply();
+                        foreach (EffectPass pass in technique.Passes)
+                        {
+                            pass.Apply();
 
-                        cubeEffect.Parameters["World"].SetValue(world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position));
-                        cubeEffect.Parameters["View"].SetValue(view);
-                        cubeEffect.Parameters["Projection"].SetValue(projection);
+                            cubeEffect.Parameters["World"].SetValue(world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position));
+                            cubeEffect.Parameters["View"].SetValue(view);
+                            cubeEffect.Parameters["Projection"].SetValue(projection);
 
-                        color = cubeData[i].color.ToVector4();
-                        cubeEffect.Parameters["AmbientColor"].SetValue(color);
-                        cubeEffect.Parameters["AmbientIntensity"].SetValue(1f);
+                            color = cubeData[i].color.ToVector4();
+                            cubeEffect.Parameters["AmbientColor"].SetValue(color);
+                            cubeEffect.Parameters["AmbientIntensity"].SetValue(1f);
 
-                        cube.Render(GraphicsDevice);//renders the cube
+                            cubeEffect.Parameters["DiffuseColor"].SetValue(color);
+                            cubeEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert((world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position)))));
+                            cubeEffect.Parameters["LightPosition"].SetValue(lightData[j].position);
+
+                            cubeEffect.Parameters["Shininess"].SetValue(30f);
+                            cubeEffect.Parameters["SpecularColor"].SetValue(lightData[j].color.ToVector4());
+
+                            cube.Render(GraphicsDevice);//renders the cube
+                        }
                     }
                 }
             }
