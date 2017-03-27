@@ -41,5 +41,6 @@
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
+/processorParam:Defines=
 /build:Cubes/pointlight.fx
 

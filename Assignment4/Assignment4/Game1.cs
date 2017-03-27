@@ -246,7 +246,10 @@ namespace Assignment4
                 }
             }
 
+            GraphicsDevice.RasterizerState = originalRasterizerState;
+
             Vector3 pos, v;
+            Vector3[] lightPositions = new Vector3[3];
 
             //generates the spheres to represent the point lights
             for(int i = 0; i < lightData.Length; i++)
@@ -258,6 +261,8 @@ namespace Assignment4
 
                 lightData[i].position += pos;
                 lightData[i].velocity *= v;
+
+                lightPositions[i] = lightData[i].position;
 
                 foreach(EffectTechnique technique in lightEffect.Techniques)
                 {
@@ -293,38 +298,35 @@ namespace Assignment4
                 cubeData[i].velocity *= v;
 
                 //shades each cube for the three point lights
-                for (int j = 0; j < lightData.Length; j++)
+
+                foreach (EffectTechnique technique in cubeEffect.Techniques)
                 {
-                    foreach (EffectTechnique technique in cubeEffect.Techniques)
+                    foreach (EffectPass pass in technique.Passes)
                     {
-                        foreach (EffectPass pass in technique.Passes)
-                        {
-                            pass.Apply();
+                        pass.Apply();
 
-                            cubeEffect.Parameters["World"].SetValue(world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position));
-                            cubeEffect.Parameters["View"].SetValue(view);
-                            cubeEffect.Parameters["Projection"].SetValue(projection);
+                        cubeEffect.Parameters["World"].SetValue(world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position));
+                        cubeEffect.Parameters["View"].SetValue(view);
+                        cubeEffect.Parameters["Projection"].SetValue(projection);
 
-                            color = cubeData[i].color.ToVector4();
-                            cubeEffect.Parameters["AmbientColor"].SetValue(color);
-                            cubeEffect.Parameters["AmbientIntensity"].SetValue(1f);
+                        color = cubeData[i].color.ToVector4();
+                        cubeEffect.Parameters["AmbientColor"].SetValue(color);
+                        cubeEffect.Parameters["AmbientIntensity"].SetValue(1f);
 
-                            cubeEffect.Parameters["DiffuseColor"].SetValue(color);
-                            cubeEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert((world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position)))));
-                            cubeEffect.Parameters["LightPosition"].SetValue(lightData[j].position);
+                        //cubeEffect.Parameters["DiffuseColor"].SetValue(color);
+                        cubeEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert((world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position)))));
+                        cubeEffect.Parameters["LightPosition"].SetValue(lightPositions);
 
-                            cubeEffect.Parameters["Camera"].SetValue(view.Translation);
+                        cubeEffect.Parameters["Camera"].SetValue(cameraPosition);
 
-                            cubeEffect.Parameters["Shininess"].SetValue(30f);
-                            cubeEffect.Parameters["SpecularColor"].SetValue(lightData[j].color.ToVector4());
+                        //cubeEffect.Parameters["Shininess"].SetValue(30f);
+                        //cubeEffect.Parameters["SpecularColor"].SetValue(lightData[j].color.ToVector4());
 
-                            cube.Render(GraphicsDevice);//renders the cube
-                        }
+                        cube.Render(GraphicsDevice);//renders the cube
                     }
                 }
             }
 
-            GraphicsDevice.RasterizerState = originalRasterizerState;
             //GraphicsDevice.BlendState = orginalBlendState;
             //GraphicsDevice.DepthStencilState = orginalDepthState;
 

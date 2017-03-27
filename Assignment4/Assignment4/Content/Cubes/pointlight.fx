@@ -20,8 +20,6 @@ static const float PI = 3.14159265f;
 
 float4 AmbientColor;
 float AmbientIntensity;
-float4 DiffuseColor = float4(1, 1, 1, 1);
-float DiffuseIntensity = 0.7;
 float Shininess = 10;
 float4 SpecularColor = float4 (1, 1, 1, 1);
 float SpecularIntensity = 0.5;
@@ -52,24 +50,28 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
-{
-	float3 normal = normalize(input.Normal);
-	float3 view = normalize(Camera-(float3)input.WorldPosition);
-	float4 specular;
-	float diffuseColor;
-	
-	for(int i = 0; i < 3; i++)
+{	
+    float diffuseColor = 0;
+    float4 specular = float4(0, 0, 0, 0);
+    float4 ambient = float4(0, 0, 0, 0);
+
+	for(int i = 0; i < 2; i++)
 	{
 		float3 lightDirection = LightPosition[i] - (float3)input.WorldPosition;
 		float intensity = pow(1-saturate(length(lightDirection) / LightRadius), 2);
 		lightDirection = normalize(lightDirection);
-		diffuseColor = diffuseColor + dot(normal,lightDirection) * intensity;
+        float3 normal = normalize(input.Normal);
+        diffuseColor += dot(normal, lightDirection) * intensity;
 		float3 reflect = normalize(2 * diffuseColor * normal - lightDirection);
+        float3 view = normalize(Camera - (float3) input.WorldPosition);
 		float dotProduct = dot(reflect, view);
-		specular = sepcular + (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor * pow(saturate(dotProduct), Shininess) * intensity;
-	}
+        specular += (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor * pow(saturate(dotProduct), Shininess) * intensity;
+    }
 	
-	return saturate(diffuseColor + AmbientColor * AmbientIntensity + specular);
+    ambient = AmbientColor * AmbientIntensity;
+    ambient[3] = 1;
+
+	return saturate(diffuseColor + ambient + specular);
 }
 
 technique PointLight
