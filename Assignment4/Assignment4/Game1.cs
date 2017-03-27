@@ -249,7 +249,7 @@ namespace Assignment4
             GraphicsDevice.RasterizerState = originalRasterizerState;
 
             Vector3 pos, v;
-            Vector3[] lightPositions = new Vector3[3];
+            Vector3[] lightPositions = new Vector3[3]; 
 
             //generates the spheres to represent the point lights
             for(int i = 0; i < lightData.Length; i++)
