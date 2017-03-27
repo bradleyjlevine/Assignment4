@@ -12,7 +12,7 @@ float4x4 View;
 float4x4 Projection;
 float4x4 WorldInverseTranspose;
 
-float3 LightPosition;
+float3 LightPosition[3];
 float LightRadius = 100;
 
 float3 Camera;
@@ -53,15 +53,21 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-	float3 lightDirection = LightPosition - (float3)input.WorldPosition;
 	float3 normal = normalize(input.Normal);
-	float intensity = pow(1-saturate(length(lightDirection) / LightRadius), 2);
-	lightDirection = normalize(lightDirection);
 	float3 view = normalize(Camera-(float3)input.WorldPosition);
-	float diffuseColor = dot(normal,lightDirection) * intensity;
-	float3 reflect = normalize(2 * diffuseColor * normal - lightDirection);
-	float dotProduct = dot(reflect, view);
-	float4 specular = (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor * pow(saturate(dotProduct), Shininess) * intensity;
+	float4 specular;
+	float diffuseColor;
+	
+	for(int i = 0; i < 3; i++)
+	{
+		float3 lightDirection = LightPosition[i] - (float3)input.WorldPosition;
+		float intensity = pow(1-saturate(length(lightDirection) / LightRadius), 2);
+		lightDirection = normalize(lightDirection);
+		diffuseColor = diffuseColor + dot(normal,lightDirection) * intensity;
+		float3 reflect = normalize(2 * diffuseColor * normal - lightDirection);
+		float dotProduct = dot(reflect, view);
+		specular = sepcular + (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor * pow(saturate(dotProduct), Shininess) * intensity;
+	}
 	
 	return saturate(diffuseColor + AmbientColor * AmbientIntensity + specular);
 }
