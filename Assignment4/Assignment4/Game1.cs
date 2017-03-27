@@ -246,7 +246,7 @@ namespace Assignment4
                 }
             }
 
-            GraphicsDevice.RasterizerState = originalRasterizerState;
+            GraphicsDevice.RasterizerState = originalRasterizerState; 
 
             Vector3 pos, v;
             Vector3[] lightPositions = new Vector3[3]; 

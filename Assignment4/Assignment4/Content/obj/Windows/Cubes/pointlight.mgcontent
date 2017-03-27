@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>C:/Users/Bradley/Source/Repos/Assignment4/Assignment4/Assignment4/Content/Cubes/pointlight.fx</SourceFile>
+  <SourceTime>2017-03-27T02:20:48.1300245-04:00</SourceTime>
+  <DestFile>C:/Users/Bradley/Source/Repos/Assignment4/Assignment4/Assignment4/Content/bin/Windows/Cubes/pointlight.xnb</DestFile>
+  <DestTime>2017-03-27T02:20:50.8440148-04:00</DestTime>
+  <Importer>EffectImporter</Importer>
+  <ImporterTime>2017-01-19T15:54:12-05:00</ImporterTime>
+  <Processor>EffectProcessor</Processor>
+  <ProcessorTime>2017-01-19T15:54:12-05:00</ProcessorTime>
+  <Parameters>
+    <Key>DebugMode</Key>
+    <Value>Auto</Value>
+  </Parameters>
+  <Parameters>
+    <Key>Defines</Key>
+    <Value />
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>
