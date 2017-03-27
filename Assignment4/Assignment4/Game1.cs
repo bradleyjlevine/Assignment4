@@ -23,6 +23,7 @@ namespace Assignment4
         public Vector3 velocity;
     }
     #endregion
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
@@ -47,6 +48,7 @@ namespace Assignment4
         Matrix projection;
         Vector3 cameraPosition = new Vector3(0, 0, 50);
         Vector3 cameraTarget = new Vector3(0, 0, 0);
+        float yaw = 0f, pitch = 0f, cameraSpeed = 5f;
 
         #endregion
 
@@ -164,38 +166,37 @@ namespace Assignment4
             KeyboardState state = Keyboard.GetState();
 
             #region Rotation and Translations of View
-            Matrix cameraRotation, cameraTranslation;
+            Matrix rotation;
 
             if (state.IsKeyDown(Keys.Up))
-                view *= Matrix.CreateRotationX(-0.05f);
+                pitch += 0.05f;
             else if (state.IsKeyDown(Keys.Down))
-                view *= Matrix.CreateRotationX(0.05f);
+                pitch -= 0.05f;
             else if (state.IsKeyDown(Keys.Left))
-                view *= Matrix.CreateRotationY(-0.05f);
+                yaw += 0.05f;
             else if (state.IsKeyDown(Keys.Right))
-                view *= Matrix.CreateRotationY(0.05f);
-            else if (state.IsKeyDown(Keys.Q))
-                view *= Matrix.CreateRotationZ(0.05f);
-            else if (state.IsKeyDown(Keys.E))
-                view *= Matrix.CreateRotationZ(-0.05f);
+                yaw -= 0.05f;
+
+            rotation = Matrix.CreateFromYawPitchRoll(yaw, pitch, 0f);
 
             if (state.IsKeyDown(Keys.A))
             {
-                view *= Matrix.CreateTranslation(1f, 0, 0);
+                cameraPosition += rotation.Left * cameraSpeed * gameTime.ElapsedGameTime.Milliseconds / 1000f;
             }
             else if (state.IsKeyDown(Keys.S))
             {
-                view *= Matrix.CreateTranslation(0, 0, -1f);
+                cameraPosition += rotation.Backward * cameraSpeed * gameTime.ElapsedGameTime.Milliseconds / 1000f;
             }
             else if (state.IsKeyDown(Keys.D))
             {
-                view *= Matrix.CreateTranslation(-1f, 0, 0);
+                cameraPosition += rotation.Right * cameraSpeed * gameTime.ElapsedGameTime.Milliseconds / 1000f;
             }
             else if (state.IsKeyDown(Keys.W))
             {
-                view *= Matrix.CreateTranslation(0, 0, 1f);
+                cameraPosition += rotation.Forward * cameraSpeed * gameTime.ElapsedGameTime.Milliseconds / 1000f;
             }
 
+            view = Matrix.CreateLookAt(cameraPosition, cameraPosition + rotation.Forward, rotation.Up);
 
             #endregion
 
@@ -312,6 +313,8 @@ namespace Assignment4
                             cubeEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert((world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position)))));
                             cubeEffect.Parameters["LightPosition"].SetValue(lightData[j].position);
 
+                            cubeEffect.Parameters["Camera"].SetValue(view.Translation);
+
                             cubeEffect.Parameters["Shininess"].SetValue(30f);
                             cubeEffect.Parameters["SpecularColor"].SetValue(lightData[j].color.ToVector4());
 
@@ -340,36 +343,36 @@ namespace Assignment4
             pos = Vector3.Zero;
             v = Vector3.One;
 
-            if (position.X + scale >= 100f)
+            if (position.X + scale >= (100f))
             {
                 pos = new Vector3(-0.5f, 0, 0);
                 v = new Vector3(-1f, 1f, 1f);
             }
-            else if (position.X - scale <= -100f)
+            else if (position.X - scale <= -(100f))
             {
                 pos = new Vector3(0.5f, 0, 0);
                 v = new Vector3(-1f, 1f, 1f);
             }
 
 
-            if (position.Y + scale >= 100f)
+            if (position.Y + scale >= (100f))
             {
                 pos = new Vector3(0, -0.5f, 0);
                 v = new Vector3(1f, -1f, 1f);
             }
-            else if (position.Y - scale <= -100f)
+            else if (position.Y - scale  <= -(100f))
             {
                 pos = new Vector3(0, 0.5f, 0);
                 v = new Vector3(1f, -1f, 1f);
             }
 
 
-            if (position.Z + scale >= 100f)
+            if (position.Z + scale >= (100f))
             {
                 pos = new Vector3(0, 0, -0.5f);
                 v = new Vector3(1f, 1f, -1f);
             }
-            else if (position.Z - scale <= -100f)
+            else if (position.Z - scale <= -(100f))
             {
                 pos = new Vector3(0, 0, 0.5f);
                 v = new Vector3(1f, 1f, -1f);
