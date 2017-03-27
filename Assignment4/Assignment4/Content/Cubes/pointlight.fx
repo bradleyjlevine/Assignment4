@@ -57,15 +57,16 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 specular = float4(0, 0, 0, 0);
     float4 ambient = float4(0, 0, 0, 0);
 
+    float3 view = normalize(Camera - (float3) input.WorldPosition);
+
 	for(int i = 0; i < 2; i++)
 	{
 		float3 lightDirection = LightPosition[i] - (float3)input.WorldPosition;
 		float intensity = pow(1-saturate(length(lightDirection) / LightRadius), 2);
 		lightDirection = normalize(lightDirection);
-        float3 normal = normalize(input.Normal);
+        float3 normal = input.Normal;
         diffuseColor += dot(normal, lightDirection) * intensity;
 		float3 reflect = normalize(2 * diffuseColor * normal - lightDirection);
-        float3 view = normalize(Camera - (float3) input.WorldPosition);
 		float dotProduct = dot(reflect, view);
         specular += (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor[i] * pow(saturate(dotProduct), Shininess) * intensity;
     }

@@ -217,16 +217,6 @@ namespace Assignment4
             rasterizerState.CullMode = CullMode.None;
             graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
-            BlendState orginalBlendState = graphics.GraphicsDevice.BlendState;
-            BlendState blendState = new BlendState();
-            blendState = BlendState.NonPremultiplied;
-            graphics.GraphicsDevice.BlendState = blendState;
-
-            DepthStencilState orginalDepthState = graphics.GraphicsDevice.DepthStencilState;
-            DepthStencilState depthState = new DepthStencilState();
-            depthState = DepthStencilState.Default;
-            graphics.GraphicsDevice.DepthStencilState = depthState;
-
             //renders skycube
             foreach (EffectTechnique technique in skyBoxEffect.Techniques)
             {
@@ -247,6 +237,7 @@ namespace Assignment4
             rasterizerState = RasterizerState.CullCounterClockwise;
             graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
+            #region Rendering PointLights and the 80 cubes
             Vector3 pos, v;
             Vector3[] lightPositions = new Vector3[3];
             Vector4[] lightColors = new Vector4[3];
@@ -314,6 +305,7 @@ namespace Assignment4
                         cubeEffect.Parameters["AmbientIntensity"].SetValue(1f);
 
                         cubeEffect.Parameters["DiffuseColor"].SetValue(cubeData[i].color.ToVector4());
+                        cubeEffect.Parameters["DiffuseIntensity"].SetValue(0.7f);
                         cubeEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert((world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position)))));
                         cubeEffect.Parameters["LightPosition"].SetValue(lightPositions);
 
@@ -327,9 +319,9 @@ namespace Assignment4
                 }
             }
 
+            #endregion
+
             GraphicsDevice.RasterizerState = originalRasterizerState;
-            //GraphicsDevice.BlendState = orginalBlendState;
-            //GraphicsDevice.DepthStencilState = orginalDepthState;
 
             base.Draw(gameTime);
         }
