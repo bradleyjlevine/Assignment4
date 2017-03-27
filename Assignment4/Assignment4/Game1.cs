@@ -227,8 +227,6 @@ namespace Assignment4
             depthState = DepthStencilState.Default;
             graphics.GraphicsDevice.DepthStencilState = depthState;
 
-            Vector4 color;
-
             //renders skycube
             foreach (EffectTechnique technique in skyBoxEffect.Techniques)
             {
@@ -246,10 +244,12 @@ namespace Assignment4
                 }
             }
 
-            GraphicsDevice.RasterizerState = originalRasterizerState; 
+            rasterizerState = RasterizerState.CullCounterClockwise;
+            graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
             Vector3 pos, v;
-            Vector3[] lightPositions = new Vector3[3]; 
+            Vector3[] lightPositions = new Vector3[3];
+            Vector4[] lightColors = new Vector4[3];
 
             //generates the spheres to represent the point lights
             for(int i = 0; i < lightData.Length; i++)
@@ -263,6 +263,7 @@ namespace Assignment4
                 lightData[i].velocity *= v;
 
                 lightPositions[i] = lightData[i].position;
+                lightColors[i] = lightData[i].color.ToVector4();
 
                 foreach(EffectTechnique technique in lightEffect.Techniques)
                 {
@@ -309,24 +310,24 @@ namespace Assignment4
                         cubeEffect.Parameters["View"].SetValue(view);
                         cubeEffect.Parameters["Projection"].SetValue(projection);
 
-                        color = cubeData[i].color.ToVector4();
-                        cubeEffect.Parameters["AmbientColor"].SetValue(color);
+                        cubeEffect.Parameters["AmbientColor"].SetValue(cubeData[i].color.ToVector4());
                         cubeEffect.Parameters["AmbientIntensity"].SetValue(1f);
 
-                        //cubeEffect.Parameters["DiffuseColor"].SetValue(color);
+                        cubeEffect.Parameters["DiffuseColor"].SetValue(cubeData[i].color.ToVector4());
                         cubeEffect.Parameters["WorldInverseTranspose"].SetValue(Matrix.Transpose(Matrix.Invert((world * Matrix.CreateScale(cubeData[i].scale) * Matrix.CreateTranslation(cubeData[i].position)))));
                         cubeEffect.Parameters["LightPosition"].SetValue(lightPositions);
 
                         cubeEffect.Parameters["Camera"].SetValue(cameraPosition);
 
-                        //cubeEffect.Parameters["Shininess"].SetValue(30f);
-                        //cubeEffect.Parameters["SpecularColor"].SetValue(lightData[j].color.ToVector4());
+                        cubeEffect.Parameters["Shininess"].SetValue(30f);
+                        cubeEffect.Parameters["SpecularColor"].SetValue(lightColors);
 
                         cube.Render(GraphicsDevice);//renders the cube
                     }
                 }
             }
 
+            GraphicsDevice.RasterizerState = originalRasterizerState;
             //GraphicsDevice.BlendState = orginalBlendState;
             //GraphicsDevice.DepthStencilState = orginalDepthState;
 

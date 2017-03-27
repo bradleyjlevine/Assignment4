@@ -18,10 +18,12 @@ float LightRadius = 100;
 float3 Camera;
 static const float PI = 3.14159265f;
 
+float4 DiffuseColor;
+float4 DiffuseIntensity;
 float4 AmbientColor;
 float AmbientIntensity;
 float Shininess = 10;
-float4 SpecularColor = float4 (1, 1, 1, 1);
+float4 SpecularColor[3];
 float SpecularIntensity = 0.5;
 
 struct VertexShaderInput
@@ -65,11 +67,12 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		float3 reflect = normalize(2 * diffuseColor * normal - lightDirection);
         float3 view = normalize(Camera - (float3) input.WorldPosition);
 		float dotProduct = dot(reflect, view);
-        specular += (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor * pow(saturate(dotProduct), Shininess) * intensity;
+        specular += (8 + Shininess) / (8 * PI) * SpecularIntensity * SpecularColor[i] * pow(saturate(dotProduct), Shininess) * intensity;
     }
 	
     ambient = AmbientColor * AmbientIntensity;
     ambient[3] = 1;
+    specular[3] = 1;
 
 	return saturate(diffuseColor + ambient + specular);
 }
